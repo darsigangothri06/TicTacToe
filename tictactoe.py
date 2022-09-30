@@ -25,11 +25,11 @@ def player(board):
     """
     xCount = 0
     oCount = 0
-    for row in range(3):
-        for col in range(3):
-            if board[row][col] == X:
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == X:
                 xCount += 1
-            elif board[row][col] == O:
+            elif board[i][j] == O:
                 oCount += 1
     if xCount > oCount:
         return O
@@ -41,10 +41,10 @@ def actions(board):
     Returns set of all possible actions (i, j) available on the board.
     """
     states = set()
-    for row in range(3):
-        for col in range(3):
-            if board[row][col] == EMPTY:
-                states.add((row,col))
+    for i in range(3):
+        for j in range(3):
+            if board[i][j] == EMPTY:
+                states.add((i, j))
     return states
 
 
@@ -87,7 +87,7 @@ def terminal(board):
     """
     Returns True if game is over, False otherwise.
     """
-    if winner(board) is not None or (not any(EMPTY in row for row in board) and winner(board) is None):
+    if (winner(board) != None) or (not any(EMPTY in row for row in board) and winner(board) == None):
         return True
     return False
 
@@ -110,6 +110,8 @@ def minimax(board):
     """
     if terminal(board):
         return None
+    
+    # taking initially maximum as positive infinity and minimum as negative infinity
     Max = float("-inf")
     Min = float("inf")
 
@@ -120,18 +122,17 @@ def minimax(board):
 
 def Max_Value(board, Max, Min):
     move = None
-    
+    # recursion termination if we reached terminal state, there is no move
     if terminal(board):
         return [utility(board), None]
     
     v = float('-inf')
     for action in actions(board):
+        res = Min_Value(result(board, action), Max, Min)[0]
+        Max = max(Max, res)
         
-        test = Min_Value(result(board, action), Max, Min)[0]
-        Max = max(Max, test)
-        
-        if test > v:
-            v = test
+        if res > v:
+            v = res
             move = action
         # Alphabeta pruning Optimisation
         if Max >= Min:
@@ -146,10 +147,10 @@ def Min_Value(board, Max, Min):
     
     v = float('inf')
     for action in actions(board):
-        test = Max_Value(result(board, action), Max, Min)[0]
-        Min = min(Min, test)
-        if test < v:
-            v = test
+        res = Max_Value(result(board, action), Max, Min)[0]
+        Min = min(Min, res)
+        if res < v:
+            v = res
             move = action
         # Alphabeta pruning optimisation
         if Max >= Min:
